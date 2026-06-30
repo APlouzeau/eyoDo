@@ -2,7 +2,7 @@ import TaskCard from "../components/TaskCard";
 
 export default function EnCours() {
     return (
-        <div className="flex min-h-screen flex-col items-center justify-between p-24">
+        <div className="flex flex-col items-center justify-between">
             En cours
             <TaskCard />
         </div>
