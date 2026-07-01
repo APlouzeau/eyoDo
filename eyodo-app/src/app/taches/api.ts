@@ -1,12 +1,12 @@
 import { CreateTaskDto, Task } from "./types/Task";
 
 export async function getTasks(): Promise<Task[]> {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/taches");
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/tasks");
     return res.json();
 }
 
 export async function createTask(data: CreateTaskDto): Promise<Task> {
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/taches", {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/tasks", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
