@@ -97,26 +97,26 @@ Le `handler` ne fait qu'extraire les données de la requête HTTP et retourner u
 
 Le `repository` est défini comme un **trait** Rust pour permettre le mock en tests unitaires.
 
-### `eyodo-next` (Next.js / App Router)
+### `eyodo-app` (Next.js / App Router)
 
 ```
 src/
-├── app/
-│   ├── layout.tsx
-│   ├── page.tsx             ← liste des todos
-│   └── todo/
-│       └── [id]/page.tsx    ← détail / édition
-└── features/
-    └── todo/
-        ├── components/      ← TodoItem, TodoForm...
-        ├── hooks/           ← useTodos(), useTodo() — React Query
+└── app/
+    ├── layout.tsx
+    ├── page.tsx
+    ├── components/          ← composants globaux réutilisables (Modal, Header, Sidebar...)
+    └── taches/
+        ├── components/      ← TaskTable, AddTaskForm...
+        ├── hooks/           ← useTasks(), useCreateTask() — React Query
         ├── api.ts           ← fonctions fetch vers eyodo-api
-        └── types.ts         ← types TypeScript (Todo, CreateTodoDto...)
+        ├── types/           ← Task, CreateTaskDto...
+        └── en-cours/
+            └── page.tsx     ← page fine, importe depuis components/ et hooks/
 ```
 
 **Règles :**
 
-- `app/` contient uniquement les pages (routing), pas de logique.
-- La logique vit dans `features/`.
+- Les pages (`page.tsx`) restent **fines** : elles n'ont pas de logique métier, elles branchent la route sur les bons composants et hooks.
+- Composants, hooks, api et types sont **co-localisés** dans le dossier de leur feature.
 - **React Query** gère l'état serveur (cache, revalidation, mutations).
 - **Zustand** uniquement pour l'état client pur (UI state, filtres actifs...).
