@@ -1,34 +1,50 @@
 "use client";
+import { useState } from "react";
 import { useTasks } from "../hooks/useTasks";
+import { useCompleteTask } from "../hooks/useCompleteTask";
+import Modal from "@/app/components/Modal";
+import ValidCompletedTask from "./ValidCompletedTask";
+import { filteredTask } from "../types/Task";
 
-export default function TaskTable() {
-    const { data: tasks, isLoading } = useTasks(); // ← destructuration correcte
+export default function TaskTable({ filter }: filteredTask) {
+    const { data: tasks, isLoading } = useTasks(filter);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const { mutate } = useCompleteTask();
     if (isLoading || !tasks) {
         return <div>Loading...</div>;
     }
 
-    console.log("tasks:", tasks); // ← ajout du log pour vérifier les données
+    console.log("tasks:", tasks);
     return (
         <>
             <table className=" table-auto w-full border-collapse border border-gray-300">
                 <thead>
                     <tr>
+                        <th className="border border-gray-300 px-4 py-2"></th>
                         <th className="border border-gray-300 px-4 py-2">Titre</th>
                         <th className="border border-gray-300 px-4 py-2">Description</th>
                         <th className="border border-gray-300 px-4 py-2">Date</th>
-                        <th className="border border-gray-300 px-4 py-2">Status</th>
                         <th className="border border-gray-300 px-4 py-2">Attribution</th>
                         <th className="border border-gray-300 px-4 py-2">Commentaires</th>
                         <th className="border border-gray-300 px-4 py-2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {tasks.map((task) => (
+                    {(tasks ?? []).map((task) => (
                         <tr key={task.id}>
+                            <td className="border border-gray-300 px-4 py-2">
+                                <input
+                                    type="checkbox"
+                                    onChange={() => {
+                                        setIsModalOpen(true);
+                                        setSelectedId(task.id);
+                                    }}
+                                />
+                            </td>
                             <td className="border border-gray-300 px-4 py-2">{task.title}</td>
                             <td className="border border-gray-300 px-4 py-2">{task.description}</td>
                             <td className="border border-gray-300 px-4 py-2">{task.dueDate}</td>
-                            <td className="border border-gray-300 px-4 py-2">{task.status}</td>
                             <td className="border border-gray-300 px-4 py-2">{task.assignedTo}</td>
                             <td className="border border-gray-300 px-4 py-2">{task.comments ?? ""}</td>
                             <td className=" flex border border-gray-300 px-4 py-2">
@@ -39,6 +55,17 @@ export default function TaskTable() {
                     ))}
                 </tbody>
             </table>
+            <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                {selectedId && (
+                    <ValidCompletedTask
+                        id={selectedId}
+                        onClose={() => setIsModalOpen(false)}
+                        onSubmit={(data) => {
+                            mutate(data.id, { onSuccess: () => setIsModalOpen(false) });
+                        }}
+                    />
+                )}
+            </Modal>
         </>
     );
 }

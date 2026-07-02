@@ -29,7 +29,6 @@ async fn main() {
             description TEXT,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
             due_date DATETIME DEFAULT NULL,
-            status TEXT CHECK(status IN ('en attente', 'en cours', 'terminé')) DEFAULT 'en attente',
             assigned_to VARCHAR(255) default NULL,
             comments TEXT,
             completed_at DATETIME default NULL

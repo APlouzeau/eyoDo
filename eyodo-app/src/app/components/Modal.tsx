@@ -24,7 +24,7 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
         <div onClick={onClose} className="fixed inset-0 bg-black/10 backdrop-blur-sm flex justify-center items-center">
             <div className="relative rounded shadow-lg" onClick={(e) => e.stopPropagation()}>
                 <button onClick={onClose} className="absolute top-2 right-2 bg-red-500 text-white px-4 py-2 rounded">
-                    Close
+                    X
                 </button>
                 {children}
             </div>

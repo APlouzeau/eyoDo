@@ -4,7 +4,6 @@ export type Task = {
     description: string;
     createdAt: string;
     dueDate?: string;
-    status: "en-cours" | "terminée";
     assignedTo: string;
     comments: string[];
     completedAt?: string;
@@ -15,4 +14,8 @@ export type CreateTaskDto = {
     description: string;
     dueDate?: string;
     assignedTo: string;
+};
+
+export type filteredTask = {
+    filter: "completed" | "in-progress";
 };
