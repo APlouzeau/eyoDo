@@ -1,4 +1,13 @@
+"use client";
+import { useTasks } from "../hooks/useTasks";
+
 export default function TaskTable() {
+    const { data: tasks, isLoading } = useTasks(); // ← destructuration correcte
+    if (isLoading || !tasks) {
+        return <div>Loading...</div>;
+    }
+
+    console.log("tasks:", tasks); // ← ajout du log pour vérifier les données
     return (
         <>
             <table className=" table-auto w-full border-collapse border border-gray-300">
@@ -14,18 +23,20 @@ export default function TaskTable() {
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td className="border border-gray-300 px-4 py-2">Task Title</td>
-                        <td className="border border-gray-300 px-4 py-2">Task Description</td>
-                        <td className="border border-gray-300 px-4 py-2">2023-01-01</td>
-                        <td className="border border-gray-300 px-4 py-2">In Progress</td>
-                        <td className="border border-gray-300 px-4 py-2">No comments</td>
-                        <td className="border border-gray-300 px-4 py-2">John Doe</td>
-                        <td className=" flex border border-gray-300 px-4 py-2">
-                            <button className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Edit</button>
-                            <button className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
-                        </td>
-                    </tr>
+                    {tasks.map((task) => (
+                        <tr key={task.id}>
+                            <td className="border border-gray-300 px-4 py-2">{task.title}</td>
+                            <td className="border border-gray-300 px-4 py-2">{task.description}</td>
+                            <td className="border border-gray-300 px-4 py-2">{task.dueDate}</td>
+                            <td className="border border-gray-300 px-4 py-2">{task.status}</td>
+                            <td className="border border-gray-300 px-4 py-2">{task.assignedTo}</td>
+                            <td className="border border-gray-300 px-4 py-2">{task.comments ?? ""}</td>
+                            <td className=" flex border border-gray-300 px-4 py-2">
+                                <button className="bg-blue-500 text-white px-2 py-1 rounded mr-2">Edit</button>
+                                <button className="bg-red-500 text-white px-2 py-1 rounded">Delete</button>
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
         </>

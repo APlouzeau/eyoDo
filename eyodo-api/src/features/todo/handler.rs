@@ -9,7 +9,7 @@ pub async fn get_todos(State(state): State<AppState>) -> Json<serde_json::Value>
     let todos = state.todo_service.get_all().await;
 
     let response = match todos {
-        Ok(todos) => json!({ "status": "success", "data": todos }),
+        Ok(todos) => json!(todos),
         Err(err) => json!({ "status": "error", "message": err.to_string() }),
     };
     Json(response)
@@ -21,7 +21,7 @@ pub async fn create_todo(
     let todo = state.todo_service.create(payload).await;
 
     let response = match todo {
-        Ok(todo) => json!({ "status": "success", "data": todo }),
+        Ok(todo) => json!(todo),
         Err(err) => json!({ "status": "error", "message": err.to_string() }),
     };
     Json(response)

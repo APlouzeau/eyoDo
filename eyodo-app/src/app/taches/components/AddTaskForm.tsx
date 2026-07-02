@@ -12,7 +12,7 @@ export default function AddTaskForm({ onSubmit, onClose }: AddTaskFormProps) {
         const task: CreateTaskDto = {
             title: data.get("taskName") as string,
             description: data.get("taskDescription") as string,
-            dateToFinish: data.get("dateToFinish") as string,
+            dueDate: data.get("dueDate") as string,
             assignedTo: data.get("assignedTo") as string,
         };
         onSubmit(task);
@@ -59,13 +59,13 @@ export default function AddTaskForm({ onSubmit, onClose }: AddTaskFormProps) {
                         </select>
                     </div>
                     <div className="mb-4 w-full">
-                        <label htmlFor="dateToFinish" className="text-sm font-medium text-gray-700">
+                        <label htmlFor="dueDate" className="text-sm font-medium text-gray-700">
                             Date de fin
                         </label>
                         <input
                             type="date"
-                            id="dateToFinish"
-                            name="dateToFinish"
+                            id="dueDate"
+                            name="dueDate"
                             className="w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
                         />
                     </div>
