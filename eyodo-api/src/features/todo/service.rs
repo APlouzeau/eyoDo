@@ -1,6 +1,7 @@
 use super::model::{CreateTaskToDo, Todo};
 use super::repository::TodoRepository;
 
+#[derive(Clone)]
 pub struct TodoService<R: TodoRepository> {
     pub repository: R,
 }

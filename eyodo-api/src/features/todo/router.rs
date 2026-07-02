@@ -3,9 +3,11 @@ use axum::{
     routing::{get, post},
 };
 
+use crate::AppState;
+
 use super::handler;
 
-pub fn routes() -> Router {
+pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/tasks", get(handler::get_todos))
         .route("/tasks", post(handler::create_todo))

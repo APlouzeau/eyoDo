@@ -1,10 +1,17 @@
 use axum::Router;
 use tokio::net::TcpListener;
 
+use crate::features::todo::repository::SqliteTodoRepository;
 use crate::features::todo::router as todo_router;
+use crate::features::todo::service::TodoService;
 
 mod db;
 mod features;
+
+#[derive(Clone)]
+pub struct AppState {
+    pub todo_service: TodoService<SqliteTodoRepository>,
+}
 
 #[tokio::main]
 async fn main() {
@@ -30,7 +37,15 @@ async fn main() {
     .await
     .expect("Failed to create todos table");
 
-    let app = Router::new().nest("/api", todo_router::routes());
+    let state = AppState {
+        todo_service: TodoService {
+            repository: SqliteTodoRepository { pool: pool.clone() },
+        },
+    };
+
+    let app = Router::new()
+        .nest("/api", todo_router::routes())
+        .with_state(state);
     let listener = TcpListener::bind("0.0.0.0:3001").await.unwrap();
     axum::serve(listener, app).await.unwrap();
 }
