@@ -20,7 +20,19 @@ impl TodoRepository for SqliteTodoRepository {
     }
 
     async fn create(&self, todo: CreateTaskToDo) -> Result<Todo, sqlx::Error> {
-        todo!()
+        sqlx::query_as::<_, Todo>(
+            r#"
+            INSERT INTO todos (title, description, date_to_finish, assigned_to)
+            VALUES (?, ?, ?, ?)
+            RETURNING id, title, description, date_to_finish, status, assigned_to, comments, completed_at
+            "#,
+        )
+        .bind(&todo.title)
+        .bind(&todo.description)
+        .bind(&todo.date_to_finish)
+        .bind(&todo.assigned_to)
+        .fetch_one(&self.pool)
+        .await
     }
 }
 
