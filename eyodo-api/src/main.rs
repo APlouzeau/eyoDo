@@ -2,7 +2,7 @@ use axum::Router;
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 
-use crate::features::todo::repository::SqliteTodoRepository;
+use crate::features::todo::repository::PostgresTodoRepository;
 use crate::features::todo::router as todo_router;
 use crate::features::todo::service::TodoService;
 
@@ -11,36 +11,27 @@ mod features;
 
 #[derive(Clone)]
 pub struct AppState {
-    pub todo_service: TodoService<SqliteTodoRepository>,
+    pub todo_service: TodoService<PostgresTodoRepository>,
 }
 
 #[tokio::main]
 async fn main() {
     dotenvy::dotenv().ok(); // Charger les variables d'environnement depuis le fichier .env
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_url = format!(
+        "postgresql://{}:{}@{}:{}/{}",
+        std::env::var("DB_USER").expect("DB_USER must be set"),
+        std::env::var("DB_PSWD").expect("DB_PSWD must be set"),
+        std::env::var("DB_URL").expect("DB_URL must be set"),
+        std::env::var("DB_PORT").expect("DB_PORT must be set"),
+        std::env::var("DB_NAME").expect("DB_NAME must be set")
+    );
     let pool = db::create_pool(&database_url)
         .await
         .expect("Failed to create database pool");
 
-    sqlx::query(
-        "CREATE TABLE IF NOT EXISTS todos (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title VARCHAR(255) NOT NULL,
-            description TEXT,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            due_date DATETIME DEFAULT NULL,
-            assigned_to VARCHAR(255) default NULL,
-            comments TEXT,
-            completed_at DATETIME default NULL
-        )",
-    )
-    .execute(&pool)
-    .await
-    .expect("Failed to create todos table");
-
     let state = AppState {
         todo_service: TodoService {
-            repository: SqliteTodoRepository { pool: pool.clone() },
+            repository: PostgresTodoRepository { pool: pool.clone() },
         },
     };
 

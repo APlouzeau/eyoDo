@@ -1,19 +1,22 @@
 export type Task = {
-    id: string;
+    id: number;
     title: string;
     description: string;
-    createdAt: string;
     dueDate?: string;
-    assignedTo: string;
-    comments: string[];
     completedAt?: string;
+    createdAt: string;
+    creatorId: number;
+    ownerUserId?: number;
+    ownerGroupId?: number;
 };
 
 export type CreateTaskDto = {
     title: string;
     description: string;
     dueDate?: string;
-    assignedTo: string;
+    creatorId: number;
+    ownerUserId?: number;
+    ownerGroupId?: number;
 };
 
 export type filteredTask = {

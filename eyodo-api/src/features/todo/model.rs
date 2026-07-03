@@ -1,32 +1,36 @@
+use chrono::{NaiveDate, NaiveDateTime};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct Todo {
     pub id: i32,
     pub title: String,
     pub description: String,
-    pub created_at: String,
-    pub due_date: Option<String>,
-    pub assigned_to: Option<String>,
-    pub comments: Option<String>,
-    pub completed_at: Option<String>,
+    pub due_date: Option<NaiveDate>,
+    pub completed_at: Option<NaiveDateTime>,
+    pub created_at: NaiveDateTime,
+    pub creator_id: i32,
+    pub owner_user_id: Option<i32>,
+    pub owner_group_id: Option<i32>,
 }
-#[derive(Serialize, Deserialize, sqlx::FromRow)]
+#[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateTaskToDo {
     pub title: String,
     pub description: String,
-    pub due_date: Option<String>,
-    pub assigned_to: Option<String>,
+    pub due_date: Option<NaiveDate>,
+    pub creator_id: i32,
+    pub owner_user_id: Option<i32>,
+    pub owner_group_id: Option<i32>,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 pub struct TaskQueryParams {
     pub filter: Option<TaskFilter>,
 }
 
-#[derive(serde::Deserialize)]
+#[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "kebab-case")]
 pub enum TaskFilter {
     Completed,

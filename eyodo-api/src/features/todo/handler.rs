@@ -5,6 +5,7 @@ use crate::features::todo::model::TaskQueryParams;
 use axum::Json;
 use axum::extract::Query;
 use axum::extract::State;
+use dbg;
 use serde_json::json;
 
 pub async fn get_todos(
@@ -12,6 +13,8 @@ pub async fn get_todos(
     Query(params): Query<TaskQueryParams>,
 ) -> Json<serde_json::Value> {
     let todos = state.todo_service.get_all(params.filter).await;
+
+    dbg!(&todos);
 
     let response = match todos {
         Ok(todos) => json!(todos),
@@ -24,8 +27,8 @@ pub async fn create_todo(
     State(state): State<AppState>,
     Json(payload): Json<CreateTaskToDo>,
 ) -> Json<serde_json::Value> {
+    dbg!(&payload);
     let todo = state.todo_service.create(payload).await;
-
     let response = match todo {
         Ok(todo) => json!(todo),
         Err(err) => json!({ "status": "error", "message": err.to_string() }),

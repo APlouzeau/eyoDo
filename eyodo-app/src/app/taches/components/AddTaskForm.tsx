@@ -12,8 +12,9 @@ export default function AddTaskForm({ onSubmit, onClose }: AddTaskFormProps) {
         const task: CreateTaskDto = {
             title: data.get("taskName") as string,
             description: data.get("taskDescription") as string,
-            dueDate: data.get("dueDate") as string,
-            assignedTo: data.get("assignedTo") as string,
+            dueDate: data.get("dueDate") ? (data.get("dueDate") as string) : undefined,
+            ownerUserId: 1,
+            creatorId: 1, // Replace with actual current user ID
         };
         onSubmit(task);
     };
@@ -50,12 +51,12 @@ export default function AddTaskForm({ onSubmit, onClose }: AddTaskFormProps) {
                             Assigné à
                         </label>
                         <select
-                            name="assignedTo"
+                            name="ownerUserId"
                             className="border border-gray-300 rounded-md shadow-sm p-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm w-full"
                         >
-                            <option value="user1">Utilisateur 1</option>
-                            <option value="user2">Utilisateur 2</option>
-                            <option value="user3">Utilisateur 3</option>
+                            <option value="1">Utilisateur 1</option>
+                            <option value="1">Utilisateur 2</option>
+                            <option value="1">Utilisateur 3</option>
                         </select>
                     </div>
                     <div className="mb-4 w-full">

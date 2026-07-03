@@ -1,8 +1,9 @@
-use sqlx::SqlitePool;
-use sqlx::sqlite::SqliteConnectOptions;
-use std::str::FromStr;
+use sqlx::PgPool;
+use sqlx::postgres::PgPoolOptions;
 
-pub async fn create_pool(database_url: &str) -> Result<SqlitePool, sqlx::Error> {
-    let options = SqliteConnectOptions::from_str(database_url)?.create_if_missing(true);
-    SqlitePool::connect_with(options).await
+pub async fn create_pool(database_url: &str) -> Result<PgPool, sqlx::Error> {
+    PgPoolOptions::new()
+        .max_connections(5)
+        .connect(database_url)
+        .await
 }

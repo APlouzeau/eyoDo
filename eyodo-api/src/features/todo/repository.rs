@@ -1,67 +1,50 @@
-use sqlx::SqlitePool;
+use sqlx::PgPool;
 
 use crate::features::todo::model::TaskFilter;
-use crate::features::todo::model::TaskQueryParams;
 
 use super::model::CreateTaskToDo;
 use super::model::Todo;
 
 #[derive(Clone)]
-pub struct SqliteTodoRepository {
-    pub pool: SqlitePool,
+pub struct PostgresTodoRepository {
+    pub pool: PgPool,
 }
 
-impl TodoRepository for SqliteTodoRepository {
+impl TodoRepository for PostgresTodoRepository {
     async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<Todo>, sqlx::Error> {
-        if filter.is_some() {
-            let filter = filter.unwrap();
-            match filter {
-                TaskFilter::Completed => {
-                    return sqlx::query_as::<_, Todo>(
-                        r#"
-                        SELECT *
-                        FROM todos
-                        WHERE completed_at IS NOT NULL
-                        "#,
-                    )
-                    .fetch_all(&self.pool)
-                    .await;
-                }
-                TaskFilter::InProgress => {
-                    return sqlx::query_as::<_, Todo>(
-                        r#"
-                        SELECT *
-                        FROM todos
-                        WHERE completed_at IS NULL
-                        "#,
-                    )
-                    .fetch_all(&self.pool)
-                    .await;
-                }
+        let mut query = "SELECT * FROM todos".to_string();
+
+        match filter {
+            Some(TaskFilter::Completed) => {
+                query += " WHERE completed_at IS NOT NULL";
             }
+            Some(TaskFilter::InProgress) => {
+                query += " WHERE completed_at IS NULL";
+            }
+            None => {}
         }
-        sqlx::query_as::<_, Todo>(
-            r#"
-            SELECT *
-            FROM todos
-            "#,
+
+        dbg!(
+            sqlx::query_as::<_, Todo>(&query)
+                .fetch_all(&self.pool)
+                .await
         )
-        .fetch_all(&self.pool)
-        .await
     }
 
     async fn create(&self, todo: CreateTaskToDo) -> Result<Todo, sqlx::Error> {
         sqlx::query_as::<_, Todo>(
             r#"
-            INSERT INTO todos (title, description, due_date, assigned_to)
-            VALUES (?, ?, ?, ?)
-            RETURNING id, title, description, due_date, assigned_to, comments, completed_at
+            INSERT INTO todos (title, description, due_date, creator_id, owner_user_id, owner_group_id)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id, title, description, due_date, creator_id, owner_user_id, owner_group_id, created_at
             "#,
         )
         .bind(&todo.title)
         .bind(&todo.description)
         .bind(&todo.due_date)
-        .bind(&todo.assigned_to)
+        .bind(&todo.creator_id)
+        .bind(&todo.owner_user_id)
+        .bind(&todo.owner_group_id)
         .fetch_one(&self.pool)
         .await
     }
@@ -71,8 +54,8 @@ impl TodoRepository for SqliteTodoRepository {
             r#"
             UPDATE todos
             SET completed_at = CURRENT_TIMESTAMP
-            WHERE id = ?
-            RETURNING id, title, description, due_date, assigned_to, comments, completed_at
+            WHERE id = $1
+            RETURNING *
             "#,
         )
         .bind(id)
