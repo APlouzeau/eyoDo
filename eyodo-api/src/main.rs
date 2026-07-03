@@ -6,12 +6,17 @@ use crate::features::todo::repository::PostgresTodoRepository;
 use crate::features::todo::router as todo_router;
 use crate::features::todo::service::TodoService;
 
+use crate::features::user::repository::PostgresUserRepository;
+use crate::features::user::router as user_router;
+use crate::features::user::service::UserService;
+
 mod db;
 mod features;
 
 #[derive(Clone)]
 pub struct AppState {
     pub todo_service: TodoService<PostgresTodoRepository>,
+    pub user_service: UserService<PostgresUserRepository>,
 }
 
 #[tokio::main]
@@ -33,6 +38,9 @@ async fn main() {
         todo_service: TodoService {
             repository: PostgresTodoRepository { pool: pool.clone() },
         },
+        user_service: UserService {
+            repository: PostgresUserRepository { pool: pool.clone() },
+        },
     };
 
     let cors = CorsLayer::new()
@@ -47,6 +55,7 @@ async fn main() {
 
     let app = Router::new()
         .nest("/api", todo_router::routes())
+        .nest("/api", user_router::routes())
         .layer(cors)
         .with_state(state);
     let listener = TcpListener::bind("0.0.0.0:3001").await.unwrap();

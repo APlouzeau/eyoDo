@@ -14,8 +14,6 @@ pub async fn get_todos(
 ) -> Json<serde_json::Value> {
     let todos = state.todo_service.get_all(params.filter).await;
 
-    dbg!(&todos);
-
     let response = match todos {
         Ok(todos) => json!(todos),
         Err(err) => json!({ "status": "error", "message": err.to_string() }),
