@@ -1,8 +1,8 @@
 use sqlx::PgPool;
 
-use super::model::CreateUser;
-use super::model::GetUsers;
+use super::model::NewUser;
 use super::model::User;
+use super::model::UserResponse;
 
 #[derive(Clone)]
 pub struct PostgresUserRepository {
@@ -10,15 +10,15 @@ pub struct PostgresUserRepository {
 }
 
 impl UserRepository for PostgresUserRepository {
-    async fn get_all(&self) -> Result<Vec<GetUsers>, sqlx::Error> {
-        let users = sqlx::query_as::<_, GetUsers>("SELECT id, name FROM users")
+    async fn get_all(&self) -> Result<Vec<UserResponse>, sqlx::Error> {
+        let users = sqlx::query_as::<_, UserResponse>("SELECT id, name FROM users")
             .fetch_all(&self.pool)
             .await;
         dbg!(&users);
         users
     }
 
-    async fn create(&self, user: CreateUser) -> Result<User, sqlx::Error> {
+    async fn create(&self, user: NewUser) -> Result<User, sqlx::Error> {
         sqlx::query_as::<_, User>(
             r#"
             INSERT INTO users (name, password)
@@ -34,6 +34,6 @@ impl UserRepository for PostgresUserRepository {
 }
 
 pub trait UserRepository {
-    async fn get_all(&self) -> Result<Vec<GetUsers>, sqlx::Error>;
-    async fn create(&self, user: CreateUser) -> Result<User, sqlx::Error>;
+    async fn get_all(&self) -> Result<Vec<UserResponse>, sqlx::Error>;
+    async fn create(&self, user: NewUser) -> Result<User, sqlx::Error>;
 }

@@ -9,14 +9,14 @@ pub struct User {
 }
 
 #[derive(Debug, serde::Deserialize)]
-pub struct CreateUser {
+pub struct NewUser {
     pub name: String,
     pub password: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, sqlx::FromRow)]
 #[serde(rename_all = "camelCase")]
-pub struct GetUsers {
+pub struct UserResponse {
     pub id: i32,
     pub name: String,
 }
