@@ -1,6 +1,8 @@
-use crate::features::todo::model::{TaskFilter, TodoResponse};
+use super::model::TaskFilter;
+use super::model_joined::TodoDetail;
+use super::model_response::TodoResponse;
 
-use super::model::{NewToDo, Todo};
+use super::model::NewTodo;
 use super::repository::TodoRepository;
 
 #[derive(Clone)]
@@ -14,14 +16,17 @@ impl<R: TodoRepository> TodoService<R> {
         &self,
         filter: Option<TaskFilter>,
     ) -> Result<Vec<TodoResponse>, sqlx::Error> {
-        self.repository.get_all(filter).await // délègue au repo
+        let todos = self.repository.get_all(filter).await?;
+        Ok(todos.into_iter().map(TodoResponse::from).collect())
     }
 
-    pub async fn create(&self, todo: NewToDo) -> Result<TodoResponse, sqlx::Error> {
-        self.repository.create(todo).await // délègue au repo
+    pub async fn create(&self, todo: NewTodo) -> Result<Vec<TodoResponse>, sqlx::Error> {
+        self.repository.create(todo).await?;
+        self.get_all(None).await
     }
 
-    pub async fn complete_todo(&self, id: i32) -> Result<TodoResponse, sqlx::Error> {
-        self.repository.complete_todo(id).await // délègue au repo
+    pub async fn complete_todo(&self, id: i32) -> Result<Vec<TodoResponse>, sqlx::Error> {
+        self.repository.complete_todo(id).await?;
+        self.get_all(None).await
     }
 }

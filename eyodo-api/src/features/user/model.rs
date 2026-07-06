@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub struct User {
     pub id: i32,
     pub name: String,
+    #[serde(skip_serializing)]
     pub password: String,
 }
 
@@ -19,4 +20,13 @@ pub struct NewUser {
 pub struct UserResponse {
     pub id: i32,
     pub name: String,
+}
+
+impl From<User> for UserResponse {
+    fn from(user: User) -> Self {
+        UserResponse {
+            id: user.id,
+            name: user.name,
+        }
+    }
 }

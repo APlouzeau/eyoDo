@@ -23,7 +23,7 @@ impl UserRepository for PostgresUserRepository {
             r#"
             INSERT INTO users (name, password)
             VALUES ($1, $2)
-            RETURNING id, name
+            RETURNING *
             "#,
         )
         .bind(&user.name)

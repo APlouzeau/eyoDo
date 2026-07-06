@@ -1,4 +1,3 @@
-use crate::features::user::model::User;
 use crate::features::user::model::UserResponse;
 
 use super::model::NewUser;
@@ -15,7 +14,8 @@ impl<R: UserRepository> UserService<R> {
         self.repository.get_all().await // délègue au repo
     }
 
-    pub async fn create(&self, user: NewUser) -> Result<User, sqlx::Error> {
-        self.repository.create(user).await // délègue au repo
+    pub async fn create(&self, user: NewUser) -> Result<UserResponse, sqlx::Error> {
+        let user = self.repository.create(user).await?;
+        Ok(user.into()) // délègue au repo
     }
 }

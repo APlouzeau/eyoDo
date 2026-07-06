@@ -1,10 +1,10 @@
 use sqlx::PgPool;
 
-use crate::features::todo::model::TaskFilter;
-use crate::features::todo::model::TodoResponse;
+use super::model::TaskFilter;
+use super::model_response::TodoResponse;
 
-use super::model::NewToDo;
-use super::model::Todo;
+use super::model::{NewTodo, Todo};
+use super::model_joined::TodoDetail;
 
 #[derive(Clone)]
 pub struct PostgresTodoRepository {
@@ -12,7 +12,7 @@ pub struct PostgresTodoRepository {
 }
 
 impl TodoRepository for PostgresTodoRepository {
-    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoResponse>, sqlx::Error> {
+    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoDetail>, sqlx::Error> {
         let mut query = "
         SELECT t.id, t.title, t.description, t.due_date, t.completed_at, t.created_at, 
                t.creator_id, u.name AS creator_name,
@@ -34,14 +34,14 @@ impl TodoRepository for PostgresTodoRepository {
             None => {}
         }
 
-        let todos = sqlx::query_as::<_, TodoResponse>(&query)
+        let todos = sqlx::query_as::<_, TodoDetail>(&query)
             .fetch_all(&self.pool)
             .await?;
         Ok(todos)
     }
 
-    async fn create(&self, todo: NewToDo) -> Result<TodoResponse, sqlx::Error> {
-        sqlx::query_as::<_, TodoResponse>(
+    async fn create(&self, todo: NewTodo) -> Result<Todo, sqlx::Error> {
+        sqlx::query_as::<_, Todo>(
             r#"
             INSERT INTO todos (title, description, due_date, creator_id, owner_user_id, owner_group_id)
             VALUES ($1, $2, $3, $4, $5, $6)
@@ -58,8 +58,8 @@ impl TodoRepository for PostgresTodoRepository {
         .await
     }
 
-    async fn complete_todo(&self, id: i32) -> Result<TodoResponse, sqlx::Error> {
-        sqlx::query_as::<_, TodoResponse>(
+    async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error> {
+        sqlx::query_as::<_, Todo>(
             r#"
             UPDATE todos
             SET completed_at = CURRENT_TIMESTAMP
@@ -74,7 +74,7 @@ impl TodoRepository for PostgresTodoRepository {
 }
 
 pub trait TodoRepository {
-    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoResponse>, sqlx::Error>;
-    async fn create(&self, todo: NewToDo) -> Result<TodoResponse, sqlx::Error>;
-    async fn complete_todo(&self, id: i32) -> Result<TodoResponse, sqlx::Error>;
+    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoDetail>, sqlx::Error>;
+    async fn create(&self, todo: NewTodo) -> Result<Todo, sqlx::Error>;
+    async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error>;
 }

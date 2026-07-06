@@ -4,7 +4,6 @@ use axum::{
 };
 
 use crate::AppState;
-use crate::error::AppError;
 
 use super::handler;
 
