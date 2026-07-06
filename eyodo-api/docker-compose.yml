@@ -1,0 +1,29 @@
+name: eyodo-db-dev
+
+services:
+  db:
+    image: postgres:15.18
+    container_name: eyodo-database-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PSWD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+      - ./db:/docker-entrypoint-initdb.d
+    networks:
+      - web
+      - internal
+
+volumes:
+  db_data:
+
+networks:
+  web:
+    external: true
+    name: web
+  internal:
+    internal: true
