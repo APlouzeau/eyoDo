@@ -1,6 +1,6 @@
 use crate::features::todo::model::{TaskFilter, TodoResponse};
 
-use super::model::{CreateTaskToDo, Todo};
+use super::model::{NewToDo, Todo};
 use super::repository::TodoRepository;
 
 #[derive(Clone)]
@@ -17,7 +17,7 @@ impl<R: TodoRepository> TodoService<R> {
         self.repository.get_all(filter).await // délègue au repo
     }
 
-    pub async fn create(&self, todo: CreateTaskToDo) -> Result<Todo, sqlx::Error> {
+    pub async fn create(&self, todo: NewToDo) -> Result<Todo, sqlx::Error> {
         self.repository.create(todo).await // délègue au repo
     }
 

@@ -16,7 +16,7 @@ pub struct Todo {
 }
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct CreateTaskToDo {
+pub struct NewToDo {
     pub title: String,
     pub description: String,
     pub due_date: Option<NaiveDate>,

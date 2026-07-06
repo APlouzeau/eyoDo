@@ -1,5 +1,5 @@
 use crate::AppState;
-use crate::features::todo::model::CreateTaskToDo;
+use crate::features::todo::model::NewToDo;
 use crate::features::todo::model::TaskQueryParams;
 
 use axum::Json;
@@ -23,7 +23,7 @@ pub async fn get_todos(
 
 pub async fn create_todo(
     State(state): State<AppState>,
-    Json(payload): Json<CreateTaskToDo>,
+    Json(payload): Json<NewToDo>,
 ) -> Json<serde_json::Value> {
     dbg!(&payload);
     let todo = state.todo_service.create(payload).await;

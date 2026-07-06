@@ -3,7 +3,7 @@ use sqlx::PgPool;
 use crate::features::todo::model::TaskFilter;
 use crate::features::todo::model::TodoResponse;
 
-use super::model::CreateTaskToDo;
+use super::model::NewToDo;
 use super::model::Todo;
 
 #[derive(Clone)]
@@ -40,7 +40,7 @@ impl TodoRepository for PostgresTodoRepository {
         Ok(todos)
     }
 
-    async fn create(&self, todo: CreateTaskToDo) -> Result<Todo, sqlx::Error> {
+    async fn create(&self, todo: NewToDo) -> Result<Todo, sqlx::Error> {
         sqlx::query_as::<_, Todo>(
             r#"
             INSERT INTO todos (title, description, due_date, creator_id, owner_user_id, owner_group_id)
@@ -75,6 +75,6 @@ impl TodoRepository for PostgresTodoRepository {
 
 pub trait TodoRepository {
     async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoResponse>, sqlx::Error>;
-    async fn create(&self, todo: CreateTaskToDo) -> Result<Todo, sqlx::Error>;
+    async fn create(&self, todo: NewToDo) -> Result<Todo, sqlx::Error>;
     async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error>;
 }
