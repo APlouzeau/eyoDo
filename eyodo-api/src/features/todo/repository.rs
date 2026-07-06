@@ -57,17 +57,18 @@ impl TodoRepository for PostgresTodoRepository {
     }
 
     async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error> {
-        sqlx::query_as::<_, Todo>(
-            r#"
-            UPDATE todos
-            SET completed_at = CURRENT_TIMESTAMP
-            WHERE id = $1
-            RETURNING *
-            "#,
-        )
-        .bind(id)
-        .fetch_one(&self.pool)
-        .await
+        sqlx::query_as!(
+        Todo,
+        r#"
+        UPDATE todos
+        SET completed_at = CURRENT_TIMESTAMP
+        WHERE id = $1
+        RETURNING id, title, description, due_date, creator_id, owner_user_id, owner_group_id, created_at, completed_at
+        "#,
+        id
+    )
+    .fetch_one(&self.pool)
+    .await
     }
 }
 

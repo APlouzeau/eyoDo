@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 pub struct Todo {
     pub id: i32,
     pub title: String,
-    pub description: String,
+    pub description: Option<String>,
     pub due_date: Option<NaiveDate>,
     pub completed_at: Option<NaiveDateTime>,
     pub created_at: NaiveDateTime,
@@ -18,7 +18,7 @@ pub struct Todo {
 #[serde(rename_all = "camelCase")]
 pub struct NewTodo {
     pub title: String,
-    pub description: String,
+    pub description: Option<String>,
     pub due_date: Option<NaiveDate>,
     pub creator_id: i32,
     pub owner_user_id: Option<i32>,
