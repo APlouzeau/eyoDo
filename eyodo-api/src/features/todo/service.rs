@@ -1,5 +1,4 @@
 use super::model::TaskFilter;
-use super::model_joined::TodoDetail;
 use super::model_response::TodoResponse;
 
 use super::model::NewTodo;

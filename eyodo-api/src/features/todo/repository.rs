@@ -1,7 +1,5 @@
-use sqlx::PgPool;
-
 use super::model::TaskFilter;
-use super::model_response::TodoResponse;
+use sqlx::PgPool;
 
 use super::model::{NewTodo, Todo};
 use super::model_joined::TodoDetail;
@@ -74,7 +72,16 @@ impl TodoRepository for PostgresTodoRepository {
 }
 
 pub trait TodoRepository {
-    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoDetail>, sqlx::Error>;
-    async fn create(&self, todo: NewTodo) -> Result<Todo, sqlx::Error>;
-    async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error>;
+    fn get_all(
+        &self,
+        filter: Option<TaskFilter>,
+    ) -> impl std::future::Future<Output = Result<Vec<TodoDetail>, sqlx::Error>> + Send;
+    fn create(
+        &self,
+        todo: NewTodo,
+    ) -> impl std::future::Future<Output = Result<Todo, sqlx::Error>> + Send;
+    fn complete_todo(
+        &self,
+        id: i32,
+    ) -> impl std::future::Future<Output = Result<Todo, sqlx::Error>> + Send;
 }
