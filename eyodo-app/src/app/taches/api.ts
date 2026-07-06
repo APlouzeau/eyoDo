@@ -1,7 +1,7 @@
-import { CreateTaskDto, Task } from "./types/Task";
+import { CreateTaskDto, Task, TaskResponse } from "./types/Task";
 import { filteredTask } from "./types/Task";
 
-export async function getTasks(filter: filteredTask["filter"]): Promise<Task[]> {
+export async function getTasks(filter: filteredTask["filter"]): Promise<TaskResponse[]> {
     const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/tasks?filter=${filter}`, {
         method: "GET",
         headers: {
@@ -22,7 +22,7 @@ export async function createTask(data: CreateTaskDto): Promise<Task> {
     return res.json();
 }
 
-export async function completeTask(id: string): Promise<Task> {
+export async function completeTask(id: number): Promise<Task> {
     console.log("Completing task with ID:", id);
     const res = await fetch(process.env.NEXT_PUBLIC_API_URL + `/tasks/${id}/complete`, {
         method: "POST",

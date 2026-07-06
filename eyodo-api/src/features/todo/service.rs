@@ -1,4 +1,4 @@
-use crate::features::todo::model::{TaskFilter, TaskQueryParams};
+use crate::features::todo::model::{TaskFilter, TodoResponse};
 
 use super::model::{CreateTaskToDo, Todo};
 use super::repository::TodoRepository;
@@ -10,7 +10,10 @@ pub struct TodoService<R: TodoRepository> {
 
 // Les méthodes du service
 impl<R: TodoRepository> TodoService<R> {
-    pub async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<Todo>, sqlx::Error> {
+    pub async fn get_all(
+        &self,
+        filter: Option<TaskFilter>,
+    ) -> Result<Vec<TodoResponse>, sqlx::Error> {
         self.repository.get_all(filter).await // délègue au repo
     }
 

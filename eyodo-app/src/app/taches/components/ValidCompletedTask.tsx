@@ -1,6 +1,6 @@
 interface ValidCompletedTaskProps {
-    id: string;
-    onSubmit: (query: { id: string }) => void;
+    id: number;
+    onSubmit: (query: { id: number }) => void;
     onClose: () => void;
 }
 

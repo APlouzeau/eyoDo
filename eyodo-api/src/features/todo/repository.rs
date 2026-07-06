@@ -1,6 +1,7 @@
 use sqlx::PgPool;
 
 use crate::features::todo::model::TaskFilter;
+use crate::features::todo::model::TodoResponse;
 
 use super::model::CreateTaskToDo;
 use super::model::Todo;
@@ -11,8 +12,17 @@ pub struct PostgresTodoRepository {
 }
 
 impl TodoRepository for PostgresTodoRepository {
-    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<Todo>, sqlx::Error> {
-        let mut query = "SELECT * FROM todos".to_string();
+    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoResponse>, sqlx::Error> {
+        let mut query = "
+        SELECT t.id, t.title, t.description, t.due_date, t.completed_at, t.created_at, 
+               t.creator_id, u.name AS creator_name,
+               t.owner_user_id, ow.name AS owner_name,
+               t.owner_group_id, g.name AS owner_group_name 
+        FROM todos t
+        LEFT JOIN users u ON t.creator_id = u.id
+        LEFT JOIN users ow ON t.owner_user_id = ow.id
+        LEFT JOIN group_ g ON t.owner_group_id = g.id"
+            .to_string();
 
         match filter {
             Some(TaskFilter::Completed) => {
@@ -25,7 +35,7 @@ impl TodoRepository for PostgresTodoRepository {
         }
 
         dbg!(
-            sqlx::query_as::<_, Todo>(&query)
+            sqlx::query_as::<_, TodoResponse>(&query)
                 .fetch_all(&self.pool)
                 .await
         )
@@ -65,7 +75,7 @@ impl TodoRepository for PostgresTodoRepository {
 }
 
 pub trait TodoRepository {
-    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<Todo>, sqlx::Error>;
+    async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoResponse>, sqlx::Error>;
     async fn create(&self, todo: CreateTaskToDo) -> Result<Todo, sqlx::Error>;
     async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error>;
 }
