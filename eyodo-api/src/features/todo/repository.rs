@@ -34,11 +34,10 @@ impl TodoRepository for PostgresTodoRepository {
             None => {}
         }
 
-        dbg!(
-            sqlx::query_as::<_, TodoResponse>(&query)
-                .fetch_all(&self.pool)
-                .await
-        )
+        let todos = sqlx::query_as::<_, TodoResponse>(&query)
+            .fetch_all(&self.pool)
+            .await?;
+        Ok(todos)
     }
 
     async fn create(&self, todo: CreateTaskToDo) -> Result<Todo, sqlx::Error> {
