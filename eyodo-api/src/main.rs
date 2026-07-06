@@ -1,4 +1,5 @@
 use axum::Router;
+use error::AppError;
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 
@@ -11,6 +12,7 @@ use crate::features::user::router as user_router;
 use crate::features::user::service::UserService;
 
 mod db;
+mod error;
 mod features;
 
 #[derive(Clone)]

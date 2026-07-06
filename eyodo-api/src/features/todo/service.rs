@@ -17,11 +17,11 @@ impl<R: TodoRepository> TodoService<R> {
         self.repository.get_all(filter).await // délègue au repo
     }
 
-    pub async fn create(&self, todo: NewToDo) -> Result<Todo, sqlx::Error> {
+    pub async fn create(&self, todo: NewToDo) -> Result<TodoResponse, sqlx::Error> {
         self.repository.create(todo).await // délègue au repo
     }
 
-    pub async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error> {
+    pub async fn complete_todo(&self, id: i32) -> Result<TodoResponse, sqlx::Error> {
         self.repository.complete_todo(id).await // délègue au repo
     }
 }

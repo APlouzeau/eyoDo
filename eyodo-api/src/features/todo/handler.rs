@@ -1,6 +1,8 @@
 use crate::AppState;
+use crate::error::AppError;
 use crate::features::todo::model::NewToDo;
 use crate::features::todo::model::TaskQueryParams;
+use crate::features::todo::model::TodoResponse;
 
 use axum::Json;
 use axum::extract::Query;
@@ -11,43 +13,29 @@ use serde_json::json;
 pub async fn get_todos(
     State(state): State<AppState>,
     Query(params): Query<TaskQueryParams>,
-) -> Json<serde_json::Value> {
-    let todos = state.todo_service.get_all(params.filter).await;
+) -> Result<Json<Vec<TodoResponse>>, AppError> {
+    let todos = state.todo_service.get_all(params.filter).await?;
 
-    let response = match todos {
-        Ok(todos) => json!(todos),
-        Err(err) => json!({ "status": "error", "message": err.to_string() }),
-    };
-    Json(response)
+    Ok(Json(todos))
 }
 
 pub async fn create_todo(
     State(state): State<AppState>,
     Json(payload): Json<NewToDo>,
-) -> Json<serde_json::Value> {
-    dbg!(&payload);
-    let todo = state.todo_service.create(payload).await;
-    let response = match todo {
-        Ok(todo) => json!(todo),
-        Err(err) => json!({ "status": "error", "message": err.to_string() }),
-    };
-    Json(response)
+) -> Result<Json<TodoResponse>, AppError> {
+    let todo = state.todo_service.create(payload).await?;
+    Ok(Json(todo))
 }
 
 pub async fn complete_todo(
     State(state): State<AppState>,
     Json(payload): Json<serde_json::Value>,
-) -> Json<serde_json::Value> {
+) -> Result<Json<TodoResponse>, AppError> {
     let id = payload
         .get("id")
         .expect("Pas d'id renseigné")
         .as_i64()
         .unwrap_or(-1) as i32;
-    let todo = state.todo_service.complete_todo(id).await;
-
-    let response = match todo {
-        Ok(todo) => json!(todo),
-        Err(err) => json!({ "status": "error", "message": err.to_string() }),
-    };
-    Json(response)
+    let todo = state.todo_service.complete_todo(id).await?;
+    Ok(Json(todo))
 }

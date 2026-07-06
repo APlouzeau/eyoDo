@@ -40,8 +40,8 @@ impl TodoRepository for PostgresTodoRepository {
         Ok(todos)
     }
 
-    async fn create(&self, todo: NewToDo) -> Result<Todo, sqlx::Error> {
-        sqlx::query_as::<_, Todo>(
+    async fn create(&self, todo: NewToDo) -> Result<TodoResponse, sqlx::Error> {
+        sqlx::query_as::<_, TodoResponse>(
             r#"
             INSERT INTO todos (title, description, due_date, creator_id, owner_user_id, owner_group_id)
             VALUES ($1, $2, $3, $4, $5, $6)
@@ -58,8 +58,8 @@ impl TodoRepository for PostgresTodoRepository {
         .await
     }
 
-    async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error> {
-        sqlx::query_as::<_, Todo>(
+    async fn complete_todo(&self, id: i32) -> Result<TodoResponse, sqlx::Error> {
+        sqlx::query_as::<_, TodoResponse>(
             r#"
             UPDATE todos
             SET completed_at = CURRENT_TIMESTAMP
@@ -75,6 +75,6 @@ impl TodoRepository for PostgresTodoRepository {
 
 pub trait TodoRepository {
     async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoResponse>, sqlx::Error>;
-    async fn create(&self, todo: NewToDo) -> Result<Todo, sqlx::Error>;
-    async fn complete_todo(&self, id: i32) -> Result<Todo, sqlx::Error>;
+    async fn create(&self, todo: NewToDo) -> Result<TodoResponse, sqlx::Error>;
+    async fn complete_todo(&self, id: i32) -> Result<TodoResponse, sqlx::Error>;
 }
