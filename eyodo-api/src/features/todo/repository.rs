@@ -1,5 +1,5 @@
 use super::model::TaskFilter;
-use sqlx::PgPool;
+use sqlx::{PgPool, QueryBuilder};
 
 use super::model::{NewTodo, Todo};
 use super::model_joined::TodoDetail;
@@ -11,47 +11,50 @@ pub struct PostgresTodoRepository {
 
 impl TodoRepository for PostgresTodoRepository {
     async fn get_all(&self, filter: Option<TaskFilter>) -> Result<Vec<TodoDetail>, sqlx::Error> {
-        let mut query = "
-        SELECT t.id, t.title, t.description, t.due_date, t.completed_at, t.created_at, 
-               t.creator_id, u.name AS creator_name,
-               t.owner_user_id, ow.name AS owner_name,
-               t.owner_group_id, g.name AS owner_group_name 
-        FROM todos t
-        LEFT JOIN users u ON t.creator_id = u.id
-        LEFT JOIN users ow ON t.owner_user_id = ow.id
-        LEFT JOIN group_ g ON t.owner_group_id = g.id"
-            .to_string();
+        let mut query: QueryBuilder<sqlx::Postgres> = QueryBuilder::new(
+            "SELECT t.id, t.title, t.description, t.due_date, t.completed_at, t.created_at,
+                t.creator_id, u.name AS creator_name,
+                t.owner_user_id, ow.name AS owner_name,
+                t.owner_group_id, g.name AS owner_group_name
+         FROM todos t
+         LEFT JOIN users u ON t.creator_id = u.id
+         LEFT JOIN users ow ON t.owner_user_id = ow.id
+         LEFT JOIN group_ g ON t.owner_group_id = g.id",
+        );
 
         match filter {
             Some(TaskFilter::Completed) => {
-                query += " WHERE completed_at IS NOT NULL";
+                query.push(" WHERE t.completed_at IS NOT NULL");
             }
             Some(TaskFilter::InProgress) => {
-                query += " WHERE completed_at IS NULL";
+                query.push(" WHERE t.completed_at IS NULL");
             }
             None => {}
         }
 
-        let todos = sqlx::query_as::<_, TodoDetail>(&query)
+        query.push(" ORDER BY t.created_at DESC");
+
+        query
+            .build_query_as::<TodoDetail>()
             .fetch_all(&self.pool)
-            .await?;
-        Ok(todos)
+            .await
     }
 
     async fn create(&self, todo: NewTodo) -> Result<Todo, sqlx::Error> {
-        sqlx::query_as::<_, Todo>(
+        sqlx::query_as!(
+            Todo,
             r#"
             INSERT INTO todos (title, description, due_date, creator_id, owner_user_id, owner_group_id)
             VALUES ($1, $2, $3, $4, $5, $6)
-            RETURNING id, title, description, due_date, creator_id, owner_user_id, owner_group_id, created_at
+            RETURNING id, title, description, due_date, creator_id, owner_user_id, owner_group_id, created_at, completed_at
             "#,
+            todo.title,
+            todo.description,
+            todo.due_date,
+            todo.creator_id,
+            todo.owner_user_id,
+            todo.owner_group_id
         )
-        .bind(&todo.title)
-        .bind(&todo.description)
-        .bind(&todo.due_date)
-        .bind(&todo.creator_id)
-        .bind(&todo.owner_user_id)
-        .bind(&todo.owner_group_id)
         .fetch_one(&self.pool)
         .await
     }

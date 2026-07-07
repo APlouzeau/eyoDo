@@ -9,22 +9,23 @@ pub struct PostgresUserRepository {
 
 impl UserRepository for PostgresUserRepository {
     async fn get_all(&self) -> Result<Vec<UserDetail>, sqlx::Error> {
-        let users = sqlx::query_as::<_, UserDetail>("SELECT id, name FROM users")
+        let users = sqlx::query_as!(UserDetail, "SELECT id, name FROM users")
             .fetch_all(&self.pool)
             .await?;
         Ok(users)
     }
 
     async fn create(&self, user: NewUser) -> Result<User, sqlx::Error> {
-        sqlx::query_as::<_, User>(
+        sqlx::query_as!(
+            User,
             r#"
             INSERT INTO users (name, password)
             VALUES ($1, $2)
-            RETURNING *
+            RETURNING id, name, password
             "#,
+            user.name,
+            user.password
         )
-        .bind(&user.name)
-        .bind(&user.password)
         .fetch_one(&self.pool)
         .await
     }

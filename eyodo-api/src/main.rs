@@ -1,5 +1,4 @@
 use axum::Router;
-use error::AppError;
 use tokio::net::TcpListener;
 use tower_http::cors::{Any, CorsLayer};
 
