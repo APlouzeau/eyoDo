@@ -8,13 +8,21 @@ use serde_json::json;
 pub enum AppError {
     NotFound,
     Database(sqlx::Error),
+    Validation(String),
 }
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         let (status, message) = match self {
             AppError::NotFound => (StatusCode::NOT_FOUND, "Not found".to_string()),
-            AppError::Database(e) => (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()),
+            AppError::Database(e) => {
+                tracing::error!("Database error: {:?}", e); // log complet côté serveur
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "Internal server error".to_string(),
+                ) // message générique au client
+            }
+            AppError::Validation(msg) => (StatusCode::BAD_REQUEST, msg),
         };
         (
             status,
@@ -26,6 +34,9 @@ impl IntoResponse for AppError {
 
 impl From<sqlx::Error> for AppError {
     fn from(e: sqlx::Error) -> Self {
-        AppError::Database(e)
+        match e {
+            sqlx::Error::RowNotFound => AppError::NotFound,
+            other => AppError::Database(other),
+        }
     }
 }

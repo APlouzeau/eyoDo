@@ -22,6 +22,7 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
     dotenvy::dotenv().ok(); // Charger les variables d'environnement depuis le fichier .env
     let database_url = format!(
         "postgresql://{}:{}@{}:{}/{}",

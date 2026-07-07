@@ -4,9 +4,10 @@ use super::model_response::TodoResponse;
 use crate::AppState;
 use crate::error::AppError;
 
-use axum::Json;
-use axum::extract::Query;
-use axum::extract::State;
+use axum::{
+    Json,
+    extract::{Query, State},
+};
 
 pub async fn get_todos(
     State(state): State<AppState>,
