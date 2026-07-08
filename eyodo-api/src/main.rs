@@ -10,6 +10,8 @@ use crate::features::user::repository::PostgresUserRepository;
 use crate::features::user::router as user_router;
 use crate::features::user::service::UserService;
 
+// AUTO-GENERATED-IMPORTS
+
 mod db;
 mod error;
 mod features;
@@ -18,6 +20,7 @@ mod features;
 pub struct AppState {
     pub todo_service: TodoService<PostgresTodoRepository>,
     pub user_service: UserService<PostgresUserRepository>,
+    // AUTO-GENERATED-SERVICE
 }
 
 #[tokio::main]
@@ -43,6 +46,7 @@ async fn main() {
         user_service: UserService {
             repository: PostgresUserRepository { pool: pool.clone() },
         },
+        // AUTO-GENERATED-STATE
     };
 
     let cors = CorsLayer::new()
