@@ -47,7 +47,7 @@ CREATE TABLE todo_assignees(
    FOREIGN KEY(user_id) REFERENCES users(id)
 );
 
-CREATE TABLE comment(
+CREATE TABLE comments(
    id SERIAL,
    todo_id INTEGER NOT NULL,
    author_id INTEGER NOT NULL,
