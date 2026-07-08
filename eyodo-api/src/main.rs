@@ -62,6 +62,7 @@ async fn main() {
     let app = Router::new()
         .nest("/api", todo_router::routes())
         .nest("/api", user_router::routes())
+        // AUTO-GENERATED-ROUTES
         .layer(cors)
         .with_state(state);
     let listener = TcpListener::bind("0.0.0.0:3001").await.unwrap();
